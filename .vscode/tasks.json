@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+            "label": "clean",
+            "type": "gulp",
+            "task": "clean",
+            "problemMatcher": []
+        },
+		{
+            "label": "make",
+            "type": "gulp",
+            "task": "make",
+            "problemMatcher": [],
+            "group": {
+                "_id": "build",
+                "isDefault": false
+            }
+        }
+	]
+}

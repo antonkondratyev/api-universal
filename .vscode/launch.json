@@ -1,0 +1,60 @@
+{
+    // Use IntelliSense to learn about possible Node.js debug attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch",
+            "program": "${file}",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "make",
+            "outputCapture": "console",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "RunServer",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
+            "args": ["-q"],
+            "program": "${workspaceFolder}/server/index.ts",
+            "restart": true,
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "RunClient",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
+            "program": "${workspaceFolder}/client/index.ts",
+            "restart": true,
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Node: Nodemon",
+            "processId": "${command:PickProcess}",
+            "restart": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug",
+            "program": "${workspaceRoot}/_build/${fileBasenameNoExtension}.js",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "make",
+            "outputCapture": "console",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": true
+        }
+    ]
+}
