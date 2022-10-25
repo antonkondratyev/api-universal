@@ -1,20 +1,23 @@
 import DatabaseOptions from '../options/DatabaseOptions';
-import Database from '../Database';
+import DatabaseList from '../database/DatabaseList';
+import RoleDatabase from '../database/RoleDatabase';
+import UserDatabase from '../database/UserDatabase';
 import ResponseData from '../ResponseData';
 import UserData from '../UserData';
 import RoleData from '../RoleData';
 import RoleModel from '../models/RoleModel';
 
 export default class RoleService {
-    private _database: Database;
+    private _database: DatabaseList = new DatabaseList();
 
     constructor(options: DatabaseOptions) {
-        this._database = new Database(options);
+        this._database.role = new RoleDatabase(options);
+        this._database.user = new UserDatabase(options);
     }
 
     public async getRoles(): Promise<ResponseData> {
         try {
-            let roles: RoleModel[] = await this._database.getRoles();
+            let roles: RoleModel[] = await this._database.role.getRoles();
             return ResponseData.create(true, 200, 'Success', roles);
         } catch (err) {
             console.error(err);
@@ -24,7 +27,7 @@ export default class RoleService {
 
     public async getRole(idOrName: number | string): Promise<ResponseData> {
         try {
-            let role: RoleModel = await this._database.getRole(idOrName);
+            let role: RoleModel = await this._database.role.getRole(idOrName);
             if (role) {
                 return ResponseData.create(true, 200, 'Success', role);
             } else {
@@ -38,10 +41,10 @@ export default class RoleService {
 
     public async addRole(authUser: UserData, role: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                if (!await this._database.isRoleExists(role.name)) {
-                    let createdRole: RoleModel = await this._database.addRole(role);
+                if (!await this._database.role.isRoleExists(role.name)) {
+                    let createdRole: RoleModel = await this._database.role.addRole(role);
                     return ResponseData.create(true, 200, 'Role Successfully Added', createdRole);
                 } else {
                     return ResponseData.create(false, 400, 'Role Already Exists');
@@ -57,11 +60,11 @@ export default class RoleService {
 
     public async changeRole(authUser: UserData, roleIdOrName: number | string, data: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                let role: RoleModel = await this._database.getRole(roleIdOrName);
+                let role: RoleModel = await this._database.role.getRole(roleIdOrName);
                 if (role) {
-                    let updatedRole: RoleModel = await this._database.changeRole(role, data);
+                    let updatedRole: RoleModel = await this._database.role.changeRole(role, data);
                     return ResponseData.create(true, 200, 'Role Successfully Changed', updatedRole);
                 } else {
                     return ResponseData.create(false, 400, 'Role Not Exists');
@@ -77,11 +80,11 @@ export default class RoleService {
 
     public async updateRole(authUser: UserData, roleIdOrName: number | string, data: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                let role: RoleModel = await this._database.getRole(roleIdOrName);
+                let role: RoleModel = await this._database.role.getRole(roleIdOrName);
                 if (role) {
-                    let updatedRole: RoleModel = await this._database.updateRole(role, data);
+                    let updatedRole: RoleModel = await this._database.role.updateRole(role, data);
                     return ResponseData.create(true, 200, 'Role Successfully Updated', updatedRole);
                 } else {
                     return ResponseData.create(false, 400, 'Role Not Exists');
@@ -97,10 +100,10 @@ export default class RoleService {
 
     public async removeRole(authUser: UserData, roleIdOrName: number | string): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                if (await this._database.isRoleExists(roleIdOrName)) {
-                    await this._database.removeRole(roleIdOrName);
+                if (await this._database.role.isRoleExists(roleIdOrName)) {
+                    await this._database.role.removeRole(roleIdOrName);
                     return ResponseData.create(true, 200, 'Role Successfully Removed');
                 } else {
                     return ResponseData.create(false, 400, 'Role Not Exists');

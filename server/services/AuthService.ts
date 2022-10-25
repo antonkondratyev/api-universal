@@ -1,6 +1,8 @@
 import * as bcrypt from 'bcryptjs';
 import DatabaseOptions from '../options/DatabaseOptions';
-import Database from '../Database';
+import DatabaseList from '../database/DatabaseList';
+import UserDatabase from '../database/UserDatabase';
+import TokenDatabase from '../database/TokenDatabase';
 import TokenService from './TokenService';
 import TokenCredentials from '../TokenCredentials';
 import ResponseData from '../ResponseData';
@@ -8,13 +10,14 @@ import UserData from '../UserData';
 import UserModel from '../models/UserModel';
 
 export default class AuthService {
-    private _database: Database;
+    private _database: DatabaseList = new DatabaseList();
     private _tokenService: TokenService;
     private readonly _username: string;
     private readonly _password: string;
 
     constructor(options: DatabaseOptions, username?: string, password?: string) {
-        this._database = new Database(options);
+        this._database.user = new UserDatabase(options);
+        this._database.token = new TokenDatabase(options);
         this._tokenService = new TokenService(options);
         this._username = username;
         this._password = password;
@@ -26,15 +29,17 @@ export default class AuthService {
                 return ResponseData.create(false, 400, 'Username and Password required');
             }
 
+            // this._database.role
+
             // TODO: check username and password for data validity
 
-            let user: UserModel = await this._database.getUser(this._username);
+            let user: UserModel = await this._database.user.getUser(this._username);
             if (!user) {
-                let count: number = await this._database.getUsersCount();
+                let count: number = await this._database.user.getUsersCount();
                 let isAdmin: boolean = count === 0 ? true : false;
 
                 let hashedPassword: string = AuthService.createHash(this._password);
-                let createdUser: UserModel = await this._database.addUser(this._username, hashedPassword, isAdmin);
+                let createdUser: UserModel = await this._database.user.addUser(this._username, hashedPassword, isAdmin);
                 let credentials: TokenCredentials = await this._tokenService.createTokenCredentials(createdUser);
 
                 return ResponseData.create(true, 201, 'User Successfully Registered', credentials);
@@ -53,7 +58,7 @@ export default class AuthService {
                 return ResponseData.create(false, 400, 'Username and Password required');
             }
 
-            let user: UserModel = await this._database.getUserWithPassword(this._username);
+            let user: UserModel = await this._database.user.getUserWithPassword(this._username);
             if (user) {
                 if (await this.isPasswordEqual(this._password, user.password)) {
                     return await this.updateTokenCredentials(user);
@@ -70,21 +75,21 @@ export default class AuthService {
     }
 
     public async logout(user: UserData): Promise<ResponseData> {
-        this._database.removeTokenById(user.id);
+        this._database.token.removeTokenById(user.id);
         return ResponseData.create(true, 200, 'User Logged Out');
     }
 
     public async updateTokenCredentials(user: UserData, refreshToken?: string): Promise<ResponseData> {
         try {
             if (refreshToken) {
-                if (await this._database.isTokenExists(refreshToken)) {
-                    await this._database.removeToken(refreshToken);
+                if (await this._database.token.isTokenExists(refreshToken)) {
+                    await this._database.token.removeToken(refreshToken);
                 } else {
                     return ResponseData.create(false, 401, 'Token Not Valid');
                 }
             } else {
-                if (await this._database.isTokenExistsById(user.id)) {
-                    await this._database.removeTokenById(user.id);
+                if (await this._database.token.isTokenExistsById(user.id)) {
+                    await this._database.token.removeTokenById(user.id);
                 }
             }
 

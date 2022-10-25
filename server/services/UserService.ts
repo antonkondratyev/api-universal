@@ -1,20 +1,21 @@
-import Database from '../Database';
+import DatabaseOptions from '../options/DatabaseOptions';
+import DatabaseList from '../database/DatabaseList';
+import UserDatabase from '../database/UserDatabase';
+import AuthService from './AuthService';
 import ResponseData from '../ResponseData';
 import UserData from '../UserData';
 import UserModel from '../models/UserModel';
-import AuthService from './AuthService';
-import DatabaseOptions from '../options/DatabaseOptions';
 
 export default class UserService {
-    private _database: Database;
+    private _database: DatabaseList = new DatabaseList();
 
     constructor(options: DatabaseOptions) {
-        this._database = new Database(options);
+        this._database.user = new UserDatabase(options);
     }
 
     public async getUsers(): Promise<ResponseData> {
         try {
-            let users: UserModel[] = await this._database.getUsers();
+            let users: UserModel[] = await this._database.user.getUsers();
             return ResponseData.create(true, 200, 'Success', users);
         } catch (err) {
             console.error(err);
@@ -24,7 +25,7 @@ export default class UserService {
 
     public async getUser(idOrName: number | string): Promise<ResponseData> {
         try {
-            let user: UserModel = await this._database.getUser(idOrName);
+            let user: UserModel = await this._database.user.getUser(idOrName);
             if (user) {
                 return ResponseData.create(true, 200, 'Success', user);
             } else {
@@ -38,12 +39,12 @@ export default class UserService {
 
     public async addUser(authUser: UserData, newUser: UserData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                if (!await this._database.isUserExists(newUser.name)) {
+                if (!await this._database.user.isUserExists(newUser.name)) {
                     let hashedPassword: string = AuthService.createHash(newUser.password);
-                    let createdUser: UserModel = await this._database.addUser(newUser.name, hashedPassword, newUser.is_admin);
-                    let user: UserData = await this._database.getUser(createdUser.id);
+                    let createdUser: UserModel = await this._database.user.addUser(newUser.name, hashedPassword, newUser.is_admin);
+                    let user: UserData = await this._database.user.getUser(createdUser.id);
                     return ResponseData.create(true, 200, 'User Successfully Added', user);
                 } else {
                     return ResponseData.create(false, 400, 'User Already Exists');
@@ -59,10 +60,10 @@ export default class UserService {
 
     public async removeUser(authUser: UserData, userIdOrName: number | string): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
             if (isAdmin) {
-                if (await this._database.isUserExists(userIdOrName)) {
-                    await this._database.removeUser(userIdOrName);
+                if (await this._database.user.isUserExists(userIdOrName)) {
+                    await this._database.user.removeUser(userIdOrName);
                     return ResponseData.create(true, 200, 'User Successfully Removed');
                 } else {
                     return ResponseData.create(false, 400, 'User Not Exists');

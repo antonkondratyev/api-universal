@@ -1,31 +1,31 @@
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } from '../config';
-import Database from '../Database';
-import UserData from '../UserData';
-import UserModel from '../models/UserModel';
-import TokenCredentials from '../TokenCredentials';
-import ResponseData from '../ResponseData';
-import ResponseHandler from '../ResponseHandler';
 import DatabaseOptions from '../options/DatabaseOptions';
+import DatabaseList from '../database/DatabaseList';
+import TokenDatabase from '../database/TokenDatabase';
+import TokenCredentials from '../TokenCredentials';
+import ResponseHandler from '../ResponseHandler';
+import ResponseData from '../ResponseData';
+import UserData from '../UserData';
 
 export default class TokenService {
-    private _database: Database;
+    private _database: DatabaseList = new DatabaseList();
     private _accessToken: string;
     private _refreshToken: string;
 
     constructor(options: DatabaseOptions) {
-        this._database = new Database(options);
+        this._database.token = new TokenDatabase(options);
     }
 
-    public async createTokenCredentials(user: UserData | UserModel): Promise<TokenCredentials> {
+    public async createTokenCredentials(user: UserData): Promise<TokenCredentials> {
         let payload: UserData = {
             id: user.id,
             name: user.name,
         }
 
         this.generateTokens(payload);
-        await this._database.addToken(user.id, this._refreshToken);
+        await this._database.token.addToken(user.id, this._refreshToken);
 
         return <TokenCredentials>{
             user: {
