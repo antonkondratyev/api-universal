@@ -1,8 +1,8 @@
 import { Sequelize, Model } from 'sequelize';
-import DatabaseOptions from './options/DatabaseOptions';
-import UserModel from './models/UserModel';
-import RoleModel from './models/RoleModel';
-import TokenModel from './models/TokenModel';
+import DatabaseOptions from '../options/DatabaseOptions';
+import UserModel from '../models/UserModel';
+import RoleModel from '../models/RoleModel';
+import TokenModel from '../models/TokenModel';
 
 export default class Database {
     private _sequelize: Sequelize;

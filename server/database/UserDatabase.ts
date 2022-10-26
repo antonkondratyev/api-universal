@@ -1,5 +1,5 @@
 import DatabaseOptions from '../options/DatabaseOptions';
-import Database from '../Database';
+import Database from './Database';
 import UserModel, { User } from '../models/UserModel';
 import UserData from '../UserData';
 

@@ -3,7 +3,7 @@ import * as express from 'express';
 import AppOptions from './options/AppOptions';
 import ServerOptions from './options/ServerOptions';
 import DatabaseOptions from './options/DatabaseOptions';
-import Database from './Database';
+import Database from './database/Database';
 import Controller from './Controller';
 
 export default class Server {

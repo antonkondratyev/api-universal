@@ -1,5 +1,5 @@
 import DatabaseOptions from '../options/DatabaseOptions';
-import Database from '../Database';
+import Database from './Database';
 import RoleModel, { Role } from '../models/RoleModel';
 import RoleData from '../RoleData';
 

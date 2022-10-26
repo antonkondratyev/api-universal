@@ -1,5 +1,5 @@
 import DatabaseOptions from '../options/DatabaseOptions';
-import Database from '../Database';
+import Database from './Database';
 import TokenModel, { Token } from '../models/TokenModel';
 
 export default class TokenDatabase extends Database {
