@@ -12,9 +12,16 @@ export default class RoleDatabase extends Database {
         super.initAssociation(RoleModel);
     }
 
+    public async addRole(role: RoleData): Promise<RoleModel> {
+        return await this.model.create({
+            name: role.name,
+            description: role.description,
+        });
+    }
+
     public async getRoles(): Promise<RoleModel[]> {
         return await this.model.findAll({
-            order: ['id']
+            order: ['id'],
         });
     }
 
@@ -40,13 +47,6 @@ export default class RoleDatabase extends Database {
             where: {
                 name: name,
             },
-        });
-    }
-
-    public async addRole(role: RoleData): Promise<RoleModel> {
-        return await this.model.create({
-            name: role.name,
-            description: role.description,
         });
     }
 
@@ -107,18 +107,11 @@ export default class RoleDatabase extends Database {
     }
 
     public async isRoleExistsById(id: number): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                id: id,
-            },
-        });
+        return !!await this.getRole(id);
     }
 
     public async isRoleExistsByName(name: string): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                name: name,
-            },
-        });
+        return !!await this.getRole(name);
+
     }
 }

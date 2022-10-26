@@ -12,6 +12,14 @@ export default class UserDatabase extends Database {
         super.initAssociation(UserModel);
     }
 
+    public async addUser(name: string, password: string, isAdmin: boolean): Promise<UserModel> {
+        return await this.model.create({
+            name: name,
+            password: password,
+            is_admin: isAdmin,
+        });
+    }
+
     public async getUsersCount(): Promise<number> {
         return await this.model.count();
     }
@@ -67,14 +75,6 @@ export default class UserDatabase extends Database {
             where: {
                 name: name,
             },
-        });
-    }
-
-    public async addUser(name: string, password: string, isAdmin: boolean): Promise<UserModel> {
-        return await this.model.create({
-            name: name,
-            password: password,
-            is_admin: isAdmin,
         });
     }
 
@@ -136,19 +136,11 @@ export default class UserDatabase extends Database {
     }
 
     public async isUserExistsById(id: number): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                id: id,
-            },
-        });
+        return !!await this.getUser(id);
     }
 
     public async isUserExistsByName(name: string): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                name: name,
-            },
-        });
+        return !!await this.getUser(name);
     }
 
     public async isAdmin(name: string): Promise<boolean> {

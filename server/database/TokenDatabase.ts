@@ -26,10 +26,10 @@ export default class TokenDatabase extends Database {
         });
     }
 
-    public async getTokenById(id: number): Promise<TokenModel> {
+    public async getTokenById(userId: number): Promise<TokenModel> {
         return await this.model.findOne({
             where: {
-                user_id: id,
+                user_id: userId,
             },
         });
     }
@@ -44,29 +44,21 @@ export default class TokenDatabase extends Database {
         }
     }
 
-    public async removeTokenById(id: number): Promise<void> {
-        if (await this.isTokenExistsById(id)) {
+    public async removeTokenById(userId: number): Promise<void> {
+        if (await this.isTokenExistsById(userId)) {
             await this.model.destroy({
                 where: {
-                    user_id: id,
+                    user_id: userId,
                 },
             });
         }
     }
 
     public async isTokenExists(token: string): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                token: token,
-            },
-        });
+        return !!await this.getToken(token);
     }
 
-    public async isTokenExistsById(id: number): Promise<boolean> {
-        return !!await this.model.findOne({
-            where: {
-                user_id: id,
-            }
-        });
+    public async isTokenExistsById(userId: number): Promise<boolean> {
+        return !!await this.getTokenById(userId);
     }
 }
