@@ -29,8 +29,6 @@ export default class AuthService {
                 return ResponseData.create(false, 400, 'Username and Password required');
             }
 
-            // this._database.role
-
             // TODO: check username and password for data validity
 
             let user: UserModel = await this._database.user.getUser(this._username);

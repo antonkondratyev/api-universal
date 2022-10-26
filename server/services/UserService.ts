@@ -58,6 +58,54 @@ export default class UserService {
         }
     }
 
+    public async changeUser(authUser: UserData, userIdOrName: number | string, data: UserData): Promise<ResponseData> {
+        try {
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            if (isAdmin) {
+                let user: UserModel = await this._database.user.getUser(userIdOrName);
+                if (user) {
+                    if (data.password) {
+                        data.password = AuthService.createHash(data.password);
+                    }
+                    await this._database.user.changeUser(user, data);
+                    let changedUser: UserData = await this._database.user.getUser(user.id);
+                    return ResponseData.create(true, 200, 'User Successfully Changed', changedUser);
+                } else {
+                    return ResponseData.create(false, 400, 'User Not Exists');
+                }
+            } else {
+                return ResponseData.create(false, 403, 'User Not Admin');
+            }
+        } catch (err) {
+            console.error(err);
+            return ResponseData.create(false, 500, 'Internal Server Error');
+        }
+    }
+
+    public async updateUser(authUser: UserData, userIdOrName: number | string, data: UserData): Promise<ResponseData> {
+        try {
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            if (isAdmin) {
+                let user: UserModel = await this._database.user.getUser(userIdOrName);
+                if (user) {
+                    if (data.password) {
+                        data.password = AuthService.createHash(data.password);
+                    }
+                    await this._database.user.updateUser(user, data);
+                    let updatedUser: UserData = await this._database.user.getUser(user.id);
+                    return ResponseData.create(true, 200, 'User Successfully Updated', updatedUser);
+                } else {
+                    return ResponseData.create(false, 400, 'User Not Exists');
+                }
+            } else {
+                return ResponseData.create(false, 403, 'User Not Admin');
+            }
+        } catch (err) {
+            console.error(err);
+            return ResponseData.create(false, 500, 'Internal Server Error');
+        }
+    }
+
     public async removeUser(authUser: UserData, userIdOrName: number | string): Promise<ResponseData> {
         try {
             let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
