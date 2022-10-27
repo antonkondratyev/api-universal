@@ -22,16 +22,6 @@ export default class TokenModel extends Model {
                         key: 'id',
                     },
                 },
-                // user_id: {
-                //     type: DataTypes.UUID,
-                //     allowNull: false,
-                //     primaryKey: true,
-                //     unique: true,
-                //     references: {
-                //         model: UserModel,
-                //         key: 'id',
-                //     },
-                // },
                 token: {
                     type: DataTypes.STRING,
                     allowNull: false,
@@ -41,6 +31,7 @@ export default class TokenModel extends Model {
                 modelName: 'tokens',
                 sequelize: sequelize,
                 freezeTableName: true,
+                underscored: true,
             }
         );
     }

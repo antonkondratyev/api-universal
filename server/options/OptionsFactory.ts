@@ -7,6 +7,7 @@ import DatabaseOptions from './DatabaseOptions';
 import AuthController from '../controllers/AuthController';
 import UserController from '../controllers/UserController';
 import RoleController from '../controllers/RoleController';
+import UserRolesController from '../controllers/UserRolesController';
 
 export default class OptionsFactory {
     public create(): AppOptions {
@@ -19,6 +20,7 @@ export default class OptionsFactory {
             new AuthController(),
             new UserController(),
             new RoleController(),
+            new UserRolesController(),
         ];
         serverOptions.middlewares = [
             cors({ credentials: true, origin: true }),

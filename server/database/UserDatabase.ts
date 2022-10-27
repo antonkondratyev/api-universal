@@ -17,6 +17,7 @@ export default class UserDatabase extends Database {
             name: name,
             password: password,
             is_admin: isAdmin,
+            roles: [],
         });
     }
 
@@ -78,6 +79,41 @@ export default class UserDatabase extends Database {
         });
     }
 
+    public async getUserRoles(user: number | string): Promise<UserModel> {
+        if (typeof user === 'number') {
+            return await this.getUserRolesById(user);
+        }
+        if (typeof user === 'string') {
+            return await this.getUserRolesByName(user);
+        }
+    }
+
+    public async getUserRolesById(id: number): Promise<UserModel> {
+        return await this.model.findOne({
+            where: {
+                id: id,
+            },
+            attributes: {
+                exclude: [
+                    'password',
+                ],
+            },
+        });
+    }
+
+    public async getUserRolesByName(name: string): Promise<UserModel> {
+        return await this.model.findOne({
+            where: {
+                name: name,
+            },
+            attributes: {
+                exclude: [
+                    'password',
+                ],
+            },
+        });
+    }
+
     public async changeUser(user: UserModel, data: UserData): Promise<UserModel> {
         Object.keys(data).forEach(prop => user[prop] = data[prop]);
         return await this.updateUser(user, user);
@@ -88,6 +124,7 @@ export default class UserDatabase extends Database {
             name: data.name,
             password: data.password,
             is_admin: data.is_admin,
+            roles: data.roles,
         },{
             where: {
                 id: user.id,
@@ -143,8 +180,22 @@ export default class UserDatabase extends Database {
         return !!await this.getUser(name);
     }
 
-    public async isAdmin(name: string): Promise<boolean> {
+    public async isAdmin(user: number | string): Promise<boolean> {
+        if (typeof user === 'number') {
+            return await this.isAdminById(user);
+        }
+        if (typeof user === 'string') {
+            return await this.isAdminByName(user);
+        }
+    }
+
+    public async isAdminById(id: number): Promise<boolean> {
+        let user: UserModel = await this.getUser(id);
+        return user.is_admin;
+    }
+
+    public async isAdminByName(name: string): Promise<boolean> {
         let user: UserModel = await this.getUser(name);
-        return !!user.is_admin;
+        return user.is_admin;
     }
 }

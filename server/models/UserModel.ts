@@ -8,7 +8,7 @@ export default class UserModel extends Model {
     public password: string;
     public is_admin: boolean;
     public role_id: number;
-    // public additional_roles: DataTypes.StringDataType[];
+    public roles: number[];
 
     public static associate(): void {
         UserModel.belongsTo(RoleModel, { foreignKey: 'role_id' });
@@ -24,13 +24,6 @@ export default class UserModel extends Model {
                     primaryKey: true,
                     allowNull: false,
                 },
-                // id: {
-                //     type: DataTypes.UUID,
-                //     defaultValue: DataTypes.UUIDV4,
-                //     primaryKey: true,
-                //     allowNull: false,
-                //     unique: true,
-                // },
                 name: {
                     type: DataTypes.STRING,
                     allowNull: false,
@@ -53,15 +46,16 @@ export default class UserModel extends Model {
                         key: 'id',
                     },
                 },
-                // additional_roles: {
-                //     type: DataTypes.ARRAY(DataTypes.STRING),
-                //     allowNull: true,
-                // },
+                roles: {
+                    type: DataTypes.ARRAY(DataTypes.INTEGER),
+                    allowNull: false,
+                },
             },
             {
                 modelName: 'users',
                 sequelize: sequelize,
                 freezeTableName: true,
+                underscored: true,
                 updatedAt: false,
             }
         );

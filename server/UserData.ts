@@ -3,4 +3,5 @@ export default class UserData {
     name: string;
     password?: string;
     is_admin?: boolean;
+    roles?: number[];
 }

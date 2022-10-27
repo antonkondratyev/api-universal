@@ -41,7 +41,7 @@ export default class RoleService {
 
     public async addRole(authUser: UserData, role: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.id);
             if (isAdmin) {
                 if (!await this._database.role.isRoleExists(role.name)) {
                     let createdRole: RoleModel = await this._database.role.addRole(role);
@@ -60,7 +60,7 @@ export default class RoleService {
 
     public async changeRole(authUser: UserData, roleIdOrName: number | string, data: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.id);
             if (isAdmin) {
                 let role: RoleModel = await this._database.role.getRole(roleIdOrName);
                 if (role) {
@@ -80,7 +80,7 @@ export default class RoleService {
 
     public async updateRole(authUser: UserData, roleIdOrName: number | string, data: RoleData): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.id);
             if (isAdmin) {
                 let role: RoleModel = await this._database.role.getRole(roleIdOrName);
                 if (role) {
@@ -100,7 +100,7 @@ export default class RoleService {
 
     public async removeRole(authUser: UserData, roleIdOrName: number | string): Promise<ResponseData> {
         try {
-            let isAdmin: boolean = await this._database.user.isAdmin(authUser.name);
+            let isAdmin: boolean = await this._database.user.isAdmin(authUser.id);
             if (isAdmin) {
                 if (await this._database.role.isRoleExists(roleIdOrName)) {
                     await this._database.role.removeRole(roleIdOrName);

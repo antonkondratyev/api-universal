@@ -34,6 +34,7 @@ export default class RoleModel extends Model {
                 modelName: 'roles',
                 sequelize: sequelize,
                 freezeTableName: true,
+                underscored: true,
                 timestamps: false,
             }
         );
