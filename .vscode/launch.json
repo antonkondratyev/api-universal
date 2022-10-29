@@ -7,18 +7,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch",
-            "program": "${file}",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "make",
-            "outputCapture": "console",
-            "console": "internalConsole",
-            "internalConsoleOptions": "openOnSessionStart",
-            "stopOnEntry": false
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "RunServer",
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
             "args": ["-q"],
@@ -43,6 +31,18 @@
             "name": "Node: Nodemon",
             "processId": "${command:PickProcess}",
             "restart": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch",
+            "program": "${file}",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "make",
+            "outputCapture": "console",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false
         },
         {
             "type": "node",
