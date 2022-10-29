@@ -1,11 +1,15 @@
 import * as bcrypt from 'bcryptjs';
+import { Request, Response, NextFunction } from 'express';
+import validator from 'validator';
 import DatabaseOptions from '../options/DatabaseOptions';
+import CredentialOptions from '../options/CredentialOptions';
 import DatabaseList from '../database/DatabaseList';
 import UserDatabase from '../database/UserDatabase';
 import TokenDatabase from '../database/TokenDatabase';
 import TokenService from './TokenService';
 import TokenCredentials from '../TokenCredentials';
 import ResponseData from '../ResponseData';
+import ResponseHandler from '../ResponseHandler';
 import UserData from '../UserData';
 import UserModel from '../models/UserModel';
 
@@ -19,27 +23,19 @@ export default class AuthService {
         this._database.user = new UserDatabase(options);
         this._database.token = new TokenDatabase(options);
         this._tokenService = new TokenService(options);
-        this._username = username;
+        this._username = username.toLowerCase();
         this._password = password;
     }
-    
+
     public async register(): Promise<ResponseData> {
         try {
-            if (!this._username || !this._password) {
-                return ResponseData.create(false, 400, 'Username and Password required');
-            }
-
-            // TODO: check username and password for data validity
-
             let user: UserModel = await this._database.user.getUser(this._username);
             if (!user) {
                 let count: number = await this._database.user.getUsersCount();
                 let isAdmin: boolean = count === 0 ? true : false;
-
                 let hashedPassword: string = AuthService.createHash(this._password);
                 let createdUser: UserModel = await this._database.user.addUser(this._username, hashedPassword, isAdmin);
                 let credentials: TokenCredentials = await this._tokenService.createTokenCredentials(createdUser);
-
                 return ResponseData.create(true, 201, 'User Successfully Registered', credentials);
             } else {
                 return ResponseData.create(false, 400, 'User Already Exists');
@@ -52,10 +48,6 @@ export default class AuthService {
 
     public async login(): Promise<ResponseData> {
         try {
-            if (!this._username || !this._password) {
-                return ResponseData.create(false, 400, 'Username and Password required');
-            }
-
             let user: UserModel = await this._database.user.getUserWithPassword(this._username);
             if (user) {
                 if (await this.isPasswordEqual(this._password, user.password)) {
@@ -92,11 +84,46 @@ export default class AuthService {
             }
 
             let credentials: TokenCredentials = await this._tokenService.createTokenCredentials(user);
-
             return ResponseData.create(true, 200, 'Token Regenerated', credentials);
         } catch (err) {
             console.error(err);
             return ResponseData.create(false, 500, 'Internal Server Error');
+        }
+    }
+
+    public static validateCredentials(req: Request, res: Response, next: NextFunction): void {
+        let cred: CredentialOptions = req.app.get('credentials');
+        let { username, password } = req.body;
+
+        try {
+            if (!username || !password) {
+                throw 'Username and Password required';
+            }
+
+            if (!validator.isAlphanumeric(username, 'en-US')) {
+                throw 'Username must be alphanumeric';
+            }
+
+            if (!validator.isLength(username, {
+                min: cred.userMinLength,
+                max: cred.userMaxLength,
+            })) {
+                throw `Invalid username: min ${cred.userMinLength}, max ${cred.userMaxLength}`;
+            }
+
+            if (!validator.isStrongPassword(password, {
+                minLength: cred.passMinLength,
+                minNumbers: cred.passMinNumbers,
+                minSymbols: cred.passMinSymbols,
+                minUppercase: cred.passMinUpper,
+                minLowercase: cred.passMinLower,
+            })) {
+                throw `Invalid password: min ${cred.passMinLength} characters, ${cred.passMinUpper} uppercase, ${cred.passMinLower} lowercase, ${cred.passMinNumbers} numbers, ${cred.passMinSymbols} symbols`;
+            }
+
+            next();
+        } catch (err) {
+            ResponseHandler.handle(res, ResponseData.create(false, 400, err));
         }
     }
 

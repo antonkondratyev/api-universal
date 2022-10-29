@@ -4,6 +4,7 @@ import * as config from '../config';
 import AppOptions from './AppOptions';
 import ServerOptions from './ServerOptions';
 import DatabaseOptions from './DatabaseOptions';
+import CredentialOptions from './CredentialOptions';
 import AuthController from '../controllers/AuthController';
 import UserController from '../controllers/UserController';
 import RoleController from '../controllers/RoleController';
@@ -37,11 +38,24 @@ export default class OptionsFactory {
         databaseOptions.pool = { idle: 10000 };
 
         /*
+         * Credential Options
+         */
+        let credentialOptions: CredentialOptions = new CredentialOptions();
+        credentialOptions.userMinLength = 3;
+        credentialOptions.userMaxLength = 30;
+        credentialOptions.passMinLength = 6;
+        credentialOptions.passMinNumbers = 1;
+        credentialOptions.passMinSymbols = 0;
+        credentialOptions.passMinUpper = 1;
+        credentialOptions.passMinLower = 1;
+
+        /*
          * App Options
          */
         let appOptions: AppOptions = new AppOptions();
         appOptions.server = serverOptions;
         appOptions.database = databaseOptions;
+        appOptions.credentials = credentialOptions;
 
         return appOptions;
     }

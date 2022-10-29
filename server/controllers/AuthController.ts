@@ -15,13 +15,13 @@ export default class AuthController extends Controller {
             path: '/register',
             method: Methods.POST,
             handler: this.register,
-            middleware: [],
+            middleware: [AuthService.validateCredentials],
         },
         {
             path: '/login',
             method: Methods.POST,
             handler: this.login,
-            middleware: [],
+            middleware: [AuthService.validateCredentials],
         },
         {
             path: '/logout',

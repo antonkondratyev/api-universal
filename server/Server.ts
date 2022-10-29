@@ -27,6 +27,7 @@ export default class Server {
 
     public loadGlobalSettings(options: AppOptions): void {
         this._app.set('database', options.database);
+        this._app.set('credentials', options.credentials);
     }
 
     public loadMiddlewares(): void {
